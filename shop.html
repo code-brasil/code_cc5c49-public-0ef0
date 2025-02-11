@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack 3D - Loja</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #1a202c;
+            color: #f7fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .package {
+            background-color: #2d3748;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .button {
+            background-color: #38a169;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #2f855a;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comprar Moedas</h1>
+
+    <div class="package">
+        <h2>Pacote 1</h2>
+        <p>1000 moedas - R$5,00</p>
+        <button class="button" onclick="buyCoins(1000, 500)">Comprar</button>
+    </div>
+
+    <div class="package">
+        <h2>Pacote 2</h2>
+        <p>5000 moedas - R$20,00</p>
+        <button class="button" onclick="buyCoins(5000, 2000)">Comprar</button>
+    </div>
+
+    <div class="package">
+        <h2>Pacote 3</h2>
+        <p>10000 moedas - R$35,00</p>
+        <button class="button" onclick="buyCoins(10000, 3500)">Comprar</button>
+    </div>
+
+    <a href="game.html" class="button">Voltar ao Jogo</a>
+
+    <script>
+        function buyCoins(amount, priceInCents) {
+            fetch('https://api.greb.com.br/functions/code_cc5c49/create_payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    product_name: `Pacote de ${amount} moedas`,
+                    product_description: `Pacote de ${amount} moedas para Blackjack 3D`,
+                    product_price: priceInCents // Em centavos
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.url) {
+                    window.location.href = data.url; // Redireciona para a URL de pagamento
+                } else {
+                    alert('Erro ao iniciar o pagamento.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao conectar com o servidor.');
+            });
+        }
+    </script>
+</body>
+</html>
