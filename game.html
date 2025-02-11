@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack 3D - Game</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #1a202c;
+            color: #f7fafc;
+            margin: 0;
+            overflow: hidden; /* Prevents scrollbars */
+        }
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #threejs-container {
+            width: 100%;
+            height: 70%;
+            /* background-color: #333;  For testing, remove later */
+        }
+        #controls {
+            padding: 20px;
+            text-align: center;
+        }
+        .button {
+            background-color: #2d3748;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 10px;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #4a5568;
+        }
+        #message {
+          margin-top: 20px;
+          font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="threejs-container"></div>
+        <div id="controls">
+            <button class="button" id="hitButton">Comprar Carta</button>
+            <button class="button" id="standButton">Parar</button>
+            <div id="betting">
+                Aposta: <input type="number" id="betAmount" value="10" min="10" step="10"> <button class="button" id="placeBet">Apostar</button>
+            </div>
+        </div>
+        <div id="message"></div>
+        <div id="player-info">Saldo: <span id="player-balance"></span> moedas</div>
+        <a href="shop.html" class="button">Comprar Moedas</a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script>
+        // THREE.js setup - Placeholder - Will be replaced with actual 3D rendering logic
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        const renderer = new THREE.WebGLRenderer({ antialias: true,  });
+        renderer.setSize( window.innerWidth, window.innerHeight * 0.7 );
+        document.getElementById('threejs-container').appendChild( renderer.domElement );
+
+        // Example: Add a basic cube
+        const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+        const cube = new THREE.Mesh( geometry, material );
+        scene.add( cube );
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame( animate );
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            renderer.render( scene, camera );
+        }
+
+        animate();
+
+
+        // Game Logic (placeholders - will be implemented in game.js)
+        let playerBalance = 1000;
+        document.getElementById('player-balance').innerText = playerBalance;
+
+        document.getElementById('placeBet').addEventListener('click', () => {
+            const betAmount = parseInt(document.getElementById('betAmount').value, 10);
+            if (isNaN(betAmount) || betAmount <= 0) {
+              alert('Por favor, insira um valor de aposta válido.');
+              return;
+            }
+
+            if (betAmount > playerBalance) {
+              alert('Saldo insuficiente.');
+              return;
+            }
+
+            // In real game, call backend with betAmount and update playerBalance
+            playerBalance -= betAmount;
+            document.getElementById('player-balance').innerText = playerBalance;
+          });
+
+        document.getElementById('hitButton').addEventListener('click', () => {
+            // Call backend for hit
+            fetch('https://api.greb.com.br/functions/code_cc5c49/hit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            }).then(response => response.json())
+              .then(data => {
+                // Update the UI based on the response from the backend
+                console.log('Hit Response:', data);
+                document.getElementById('message').innerText = data.message; // Example
+            }).catch(error => {
+                console.error('Error:', error);
+                document.getElementById('message').innerText = 'Erro ao comprar carta.';
+            });
+        });
+
+        document.getElementById('standButton').addEventListener('click', () => {
+            // Call backend for stand
+            fetch('https://api.greb.com.br/functions/code_cc5c49/stand', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            }).then(response => response.json())
+              .then(data => {
+                // Update the UI based on the response from the backend
+                console.log('Stand Response:', data);
+                document.getElementById('message').innerText = data.message; // Example
+            }).catch(error => {
+                console.error('Error:', error);
+                document.getElementById('message').innerText = 'Erro ao parar.';
+            });
+        });
+    </script>
+</body>
+</html>
